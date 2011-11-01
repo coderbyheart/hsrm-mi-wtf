@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+
+		Dieses Dokument dient zur Validierung der
+		Schnittstellen-Dokumentations-XML-Datei. @author Markus Tacker
+		@version $Id: schnittstellen.xsd 469 2011-07-19 14:45:55Z  $
+	-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="leuchttischapi">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="types">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="simpletype" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Definiert einfache Typen wie Skalare,
+										Zeichenketten, Chars und Booleans</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="description" type="description" />
+										<xs:element name="example" />
+										<xs:element name="todo" type="todo" minOccurs="0" />
+									</xs:sequence>
+									<xs:attribute name="name" type="xs:ID" use="required">
+										<xs:annotation>
+											<xs:documentation>Name des Types</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="enum" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Definiert Enums</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="description" type="description" />
+										<xs:element name="example" />
+										<xs:element name="items" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Definiert die Werte eines Enums
+												</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="item" maxOccurs="unbounded">
+														<xs:annotation>
+															<xs:documentation>Definiert einen Wert eines Enums
+															</xs:documentation>
+														</xs:annotation>
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="description" type="description" />
+															</xs:sequence>
+															<xs:attribute name="value" type="xs:string"
+																use="required">
+																<xs:annotation>
+																	<xs:documentation>Der Wert des Enums, wird beim
+																		Übertragen verwendet</xs:documentation>
+																</xs:annotation>
+															</xs:attribute>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="todo" type="todo" minOccurs="0" />
+									</xs:sequence>
+									<xs:attribute name="name" type="xs:ID" use="required">
+										<xs:annotation>
+											<xs:documentation>Name des Enums</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="complextype" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Definiert komplexe Typen wie Objekte,
+										Dictionaries</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="description" type="description" />
+										<xs:element name="todo" type="todo" minOccurs="0" />
+										<xs:element name="property" type="property"
+											maxOccurs="unbounded" />
+									</xs:sequence>
+									<xs:attribute name="name" type="xs:ID" use="required">
+										<xs:annotation>
+											<xs:documentation>Name des Types</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="type" use="required">
+										<xs:annotation>
+											<xs:documentation>Gibt an, um was für eine Art es sich
+												handelt.</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:pattern value="Object|Dictionary" />
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="actions">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="group" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Gruppiert Methoden in Namespaces
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="description" type="description" />
+										<xs:element name="todo" type="todo" minOccurs="0" />
+										<xs:element name="action" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:annotation>
+													<xs:documentation>Beschreibt eine Methode
+													</xs:documentation>
+												</xs:annotation>
+												<xs:sequence>
+													<xs:element name="description" type="description" />
+													<xs:element name="todo" type="todo" minOccurs="0" />
+													<xs:element name="request">
+														<xs:complexType>
+															<xs:annotation>
+																<xs:documentation>Die akzeptierten Parameter der
+																	Methode. Darf leer sein, wenn keine Parameter benötigt
+																	werden.</xs:documentation>
+															</xs:annotation>
+															<xs:sequence>
+																<xs:element name="property" type="property"
+																	minOccurs="0" maxOccurs="unbounded" />
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="response">
+														<xs:complexType>
+															<xs:annotation>
+																<xs:documentation>Die Elemente der Antwort
+																</xs:documentation>
+															</xs:annotation>
+															<xs:choice>
+																<xs:element name="property" type="property"
+																	maxOccurs="unbounded">
+																	<xs:annotation>
+																		<xs:documentation>Listet die Elemente der Antwort als
+																			einfache Properties auf.</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+															</xs:choice>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="notification" minOccurs="0">
+														<xs:complexType>
+															<xs:annotation>
+																<xs:documentation>Notifications werden versendet, wenn
+																	die Aktion durch einen dritten ausgelöst wird.
+																</xs:documentation>
+															</xs:annotation>
+															<xs:choice>
+																<xs:element name="property" type="property"
+																	maxOccurs="unbounded">
+																	<xs:annotation>
+																		<xs:documentation>Listet die Elemente der Notification
+																			als einfache Properties auf.</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+															</xs:choice>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="name" type="xs:token" use="required">
+													<xs:annotation>
+														<xs:documentation>Name der Methode</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="inServer" type="xs:boolean">
+													<xs:annotation>
+														<xs:documentation>Gibt an, ob die Methode im Server
+															implementiert ist</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="inClient" type="xs:boolean">
+													<xs:annotation>
+														<xs:documentation>Gibt an, ob die Methode im Client
+															implementiert ist</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="messageType" type="xs:Name">
+													<xs:annotation>
+														<xs:documentation>Definiert den Namen mit dem diese
+															Schnittstelle als Nachricht identifiziert wird.
+														</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="name" type="xs:token" use="required">
+										<xs:annotation>
+											<xs:documentation>Name des Namespaces</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="nonEmptyString">
+		<xs:annotation>
+			<xs:documentation>Ein nicht leerer-Text.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="description">
+		<xs:annotation>
+			<xs:documentation>Enthält eine Beschreibung des Elements
+			</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="nonEmptyString" />
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="todo">
+		<xs:annotation>
+			<xs:documentation>Enthält die Beschreibung eines offenen Punktes
+				(todo) für dieses Element.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="nonEmptyString" />
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="property">
+		<xs:annotation>
+			<xs:documentation>Definiert einen Methoden-Parameter oder einen der
+				Werte einer Antwort. Ein Beispiel-Wert wird als Inhalt des Elements
+				angegeben.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="example" minOccurs="0"></xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:token" use="required">
+			<xs:annotation>
+				<xs:documentation>Name der Property</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" type="xs:IDREFS" use="required">
+			<xs:annotation>
+				<xs:documentation>Typ aus der Liste der Typen</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="description" type="nonEmptyString"
+			use="required">
+			<xs:annotation>
+				<xs:documentation>Beschreibung der Property</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="multiple" type="xs:boolean" use="optional">
+			<xs:annotation>
+				<xs:documentation>Gibt an, ob es sich um eine Liste von Objekten
+					dieses Types handelt.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="optional" type="xs:boolean" use="optional">
+			<xs:annotation>
+				<xs:documentation>Gibt an, ob die Property entfallen kann.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,1226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+		Dieses Dokument beschreibt die externe API, die vom Server zur
+		Verfügung gestellt wird. Es dient dazu, eine menschen-lesbare
+		API-Dokumentation in Form von Wiki-Seite und PDF- Dateien zu erzeugen
+		(todo) und automatisierte Tests aus zu führen.
+
+		@author Markus Tacker
+		@author Simon Franzen
+		@version $Id: schnittstellen.xml 469 2011-07-19 14:45:55Z  $
+
+		TODO: Search-Filter, Search-Filter-List genau definieren
+		TODO: User Profile weiter ausbauen
+	-->
+<leuchttischapi xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schnittstellen.xsd">
+  <!--
+		Hier werden die im Dokument verwendeten Parameter-Typen definiert.
+	-->
+  <types>
+    <!-- Einfache Typen sind Skalare, Zeichenketten, Chars und Booleans -->
+    <simpletype name="String">
+      <description>Repräsentiert ein String</description>
+      <example>Lorem ipsum</example>
+    </simpletype>
+    <simpletype name="Integer">
+      <description>Repräsentiert ein Integer</description>
+      <example>17</example>
+    </simpletype>
+    <simpletype name="Boolean">
+      <description>Repräsentiert ein Boolean</description>
+      <example>True</example>
+    </simpletype>
+    <simpletype name="Float">
+      <description>Repräsentiert ein Float</description>
+      <example>17.0</example>
+    </simpletype>
+    <simpletype name="binary">
+      <description>Repräsentiert binare Daten, z.B. Bilddaten eines Fotos</description>
+      <example>(binary)</example>
+    </simpletype>
+    <simpletype name="DateTime">
+      <description>Repräsentiert ein Datum mit Uhrzeit. Das Format ist YYYY-MM-DDTHH:MM:SS+ZZZZ</description>
+      <example>2011-03-28T17:58:23+0001</example>
+    </simpletype>
+    <enum name="Rating">
+      <description>Repräsentiert die Bewertung eines Bildes</description>
+      <example>1</example>
+      <items>
+        <item value="-">
+          <description>abgelehnt</description>
+        </item>
+        <item value="o">
+          <description>neutral</description>
+        </item>
+        <item value="+">
+          <description>markiert</description>
+        </item>
+      </items>
+    </enum>
+    <enum name="Sex">
+      <description>Repräsentiert das Geschlecht einer Person</description>
+      <example>M</example>
+      <items>
+        <item value="M">
+          <description>männlich</description>
+        </item>
+        <item value="F">
+          <description>weiblich</description>
+        </item>
+      </items>
+    </enum>
+    <enum name="Role">
+      <description>Repräsentiert die Rolle einer Person</description>
+      <example>Agency</example>
+      <items>
+        <item value="Agency">
+          <description>Agentur</description>
+        </item>
+        <item value="Customer">
+          <description>Kunde</description>
+        </item>
+        <item value="Photographer">
+          <description>Fotograf</description>
+        </item>
+      </items>
+    </enum>
+    <enum name="LightboxState">
+      <description>Status einer Lightbox</description>
+      <example>shared</example>
+      <items>
+        <item value="private">
+          <description>Die Lightbox ist für niemanden zugänglich</description>
+        </item>
+        <item value="shared">
+          <description>Die Lightbox wird mit anderen geteilt</description>
+        </item>
+        <item value="closed">
+          <description>Die Lightbox ist geschlossen.</description>
+        </item>
+      </items>
+    </enum>
+    <complextype name="ErrorMessage" type="Object">
+      <description>Repräsentiert eine Message mit einer Fehlermeldung</description>
+      <property name="id" type="Integer" description="Die ID der Fehlermeldung"/>
+      <property name="string" type="String" description="Fehlermeldung">
+        <example>Es trat ein Fehler bei der Bildübertragen auf.</example>
+      </property>
+      <property name="data" type="String" description="Beliebige zusätzliche Daten für die Fehlermeldung">
+        <example>Disk quota exceeded</example>
+      </property>
+    </complextype>
+    <complextype name="SuccessMessage" type="Object">
+      <description>Repräsentiert eine Message die einen Erfolg wiedergibt</description>
+      <property name="id" type="Integer" description="Die ID der Erfolgsmeldung"/>
+    </complextype>
+    <complextype name="Response" type="Object">
+      <description>Repräsentiert eine Antwort</description>
+      <property name="iserror" type="Boolean" description="Gibt an, ob es sich um einen Fehler handelt">
+        <example>False</example>
+      </property>
+      <property name="error" type="ErrorMessage" description="Beschreibt den aufgetretenen Fehler, wenn einer aufgetreten ist. Ansonsten ist das Attribut null."/>
+      <property name="result" type="SuccessMessage" description="Enthält das Ergebnis der Anfrage"/>
+    </complextype>
+    <complextype name="Tag" type="Object">
+      <description>Repräsentiert ein Tag</description>
+      <property name="id" type="Integer" description="Die ID des Tags">
+        <example>23344</example>
+      </property>
+      <property name="userID" type="Integer" description="userID des Besitzers">
+        <example>234544</example>
+      </property>
+      <property name="photoID" type="Integer" description="photoID des zugehörigen Photos">
+        <example>234544</example>
+      </property>
+      <property name="name" type="String" description="Der Tag-String">
+        <example>Garten</example>
+      </property>
+      <property name="role" type="Role" description="Die Rollenzugehörigkeit des Tags">
+			</property>
+      <property name="isNew" type="Boolean" description="Beschreibt, ob der Tag gerade neu hinzugefügt wurde.">
+        <example>234544</example>
+      </property>
+      <property name="isDeleted" type="Boolean" description="Beschreibt, ob der Tag gerade gelöscht wurde.">
+        <example>234544</example>
+      </property>
+    </complextype>
+    <complextype name="Category" type="Object">
+      <description>Repräsentiert eine Kategorie</description>
+      <property name="id" type="Integer" description="ID der Kategorie">
+        <example>55443</example>
+      </property>
+      <property name="titel" type="String" description="Name der Kategorie">
+        <example>Berglandschaft</example>
+      </property>
+      <property name="parentID" type="Integer" description="Die übergeordnete Kategorie">
+        <example>Landschaft</example>
+      </property>
+    </complextype>
+    <complextype name="Lightbox" type="Object">
+      <description>Repräsentiert eine Lightbox</description>
+      <property name="id" type="Integer" description="ID der Lightbox">
+        <example>28388</example>
+      </property>
+      <property name="name" type="String" description="Name der Lightbox">
+        <example>Projekt2011</example>
+      </property>
+      <property name="description" type="String" description="Beschreibung der Lightbox">
+        <example>Das ist die Beschreibung der Lightbox.</example>
+      </property>
+      <property name="state" type="LightboxState" description="Aktueller Zustand der Lightbox"/>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="PhotoData" type="Object">
+      <description>Repräsentiert die Daten eines Fotos</description>
+      <todo>FIXME: exif_Timestamp sollte vom Typ DateTime sein. Siehe #419.</todo>
+      <property name="id" type="Integer" description="Id des Fotos">
+        <example>23334</example>
+      </property>
+      <property name="deleteFlag" type="Boolean" description="Gibt an, ob das Foto vom Fotografen gelöscht wurde"/>
+      <property name="soldFlag" type="Boolean" description="Gibt an, ob das Foto mindestens einmal verkauft wurde."/>
+      <property name="name" type="String" description="Name des Fotos">
+        <example>Foto001_super</example>
+      </property>
+      <property name="description" type="String" description="Beschreibung des Fotos">
+        <example>23334</example>
+      </property>
+      <property name="height" type="Integer" description="Höhe des Fotos">
+        <example>500</example>
+      </property>
+      <property name="width" type="Integer" description="Breite des Fotos">
+        <example>300</example>
+      </property>
+      <property name="price" type="Float" description="Preis des Fotos">
+        <example>4.90</example>
+      </property>
+      <property name="exif_Timestamp" type="String" description="exif_Timestamp">
+        <example>2011-12-31 17:13:05</example>
+      </property>
+      <property name="exif_Orientation" type="String" description="exif_Orientation">
+        <example>??</example>
+      </property>
+      <property name="exif_Location" type="String" description="exif_Location">
+        <example>??</example>
+      </property>
+      <property name="category" type="Category" description="Kategorie des Fotos"/>
+      <property name="tags" type="Tag" multiple="true" description="Tags des Fotos"/>
+      <property name="upload_Timestamp" type="String" description="Das Hochladedatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="AgencyPhotoData" type="Object">
+      <description>Repräsentiert Informationen eines agenturspezifischen Fotos</description>
+      <property name="id" type="Integer" description="Id des Fotos">
+        <example>23334</example>
+      </property>
+      <property name="name" type="String" description="Agenturspezifische Titel des Bildes">
+        <example>Neue Abendsonne</example>
+      </property>
+      <property name="rate" type="Float" description="Gebühr der Agentur">
+        <example>17.0</example>
+      </property>
+    </complextype>
+    <complextype name="LightboxPhotoData" type="Object">
+      <description>Repräsentiert die Ligtboxspezifischen Attribute eines Photos</description>
+      <property name="photoID" type="Integer" description="Id des Fotos">
+        <example>23334</example>
+      </property>
+      <property name="lightboxID" type="Integer" description="Id der Lightbox">
+        <example>23334</example>
+      </property>
+      <property name="titel" type="String" description="Lightboxspezifischer Titel des Bildes">
+        <example>Neue Abendsonne</example>
+      </property>
+      <property name="rating" type="Rating" description="Gibt an, wie ein Kunde das Foto bewertet hat"/>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="User" type="Object">
+      <description>Repräsentiert ein User-Objekt</description>
+      <property name="id" type="Integer" description="userID des Users">
+        <example>34443</example>
+      </property>
+      <property name="username" type="String" description="Der Nutzername des Users">
+        <example>k_schmidt</example>
+      </property>
+      <property name="email" type="String" description="Die E-Mail Adresse des Users">
+        <example>klas.s@email.com</example>
+      </property>
+      <property name="firstname" type="String" description="Der Vorname des Users">
+        <example>Klaus</example>
+      </property>
+      <property name="lastname" type="String" description="Der Nachname des Users">
+        <example>Schmidt</example>
+      </property>
+      <property name="birthday" type="DateTime" description="Das Geburtsdatum"/>
+      <property name="sex" type="Sex" description="Das Geschlecht des Users"/>
+      <property name="website" type="String" description="Die Website des Users">
+        <example>www.k-schmidt.de</example>
+      </property>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="User-Info" type="Object">
+      <description>Repräsentiert eine einfaches User-Objekt, welches anderen Nutzern zu Verfügung steht</description>
+      <property name="id" type="Integer" description="userID des Users">
+        <example>34443</example>
+      </property>
+      <property name="username" type="String" description="Der Nutzername des Users">
+        <example>k_schmidt</example>
+      </property>
+      <property name="firstname" type="String" description="Der Vorname des Users">
+        <example>Klaus</example>
+      </property>
+      <property name="lastname" type="String" description="Der Nachname des Users">
+        <example>Schmidt</example>
+      </property>
+      <property name="email" type="String" description="Die E-Mail Adresse des Users">
+        <example>klas.s@email.com</example>
+      </property>
+      <property name="website" type="String" description="Die Website des Users">
+        <example>www.k-schmidt.de</example>
+      </property>
+      <property name="sex" type="Sex" description="Das Geschlecht des Users"/>
+    </complextype>
+    <complextype name="Photographer" type="Object">
+      <description>Repräsentiert ein Fotografen Profil</description>
+      <property name="id" type="Integer" description="userID des Fotografen">
+        <example>34443</example>
+      </property>
+      <property name="username" type="String" description="Nutzername des Ftoografen">
+        <example>k_schmidt</example>
+      </property>
+      <property name="email" type="String" description="E-Mail Adresse des Fotografen">
+        <example>klas.s@email.com</example>
+      </property>
+      <property name="firstname" type="String" description="Der Vorname des Fotografen">
+        <example>Klaus</example>
+      </property>
+      <property name="lastname" type="String" description="Der Name des Fotografen">
+        <example>Schmidt</example>
+      </property>
+      <property name="birthday" type="DateTime" description="Das Geburtsdatum"/>
+      <property name="sex" type="Sex" description="Das Geschlecht des Fotografen"/>
+      <property name="website" type="String" description="Die Webiste des Fotografen">
+        <example>www.k-schmidt.de</example>
+      </property>
+      <property name="photoPrice" type="Float" description="Globaler Preis für die Fotos des Fotografen">
+        <example>2.95</example>
+      </property>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="Employee" type="Object">
+      <description>Repräsentiert ein Mitarbeiter Profil</description>
+      <property name="id" type="Integer" description="userID des Mitarbeiters">
+        <example>34443</example>
+      </property>
+      <property name="username" type="String" description="Benutzername des Mitarbeiters">
+        <example>k_schmidt</example>
+      </property>
+      <property name="email" type="String" description="Die E-Mail Adresse des Mitarbeiters">
+        <example>klas.s@email.com</example>
+      </property>
+      <property name="firstname" type="String" description="Der Vorname des Mitarbeiters">
+        <example>Klaus</example>
+      </property>
+      <property name="lastname" type="String" description="Der Nachname des Mitarbeiters">
+        <example>Schmidt</example>
+      </property>
+      <property name="birthday" type="DateTime" description="Das Geburtsdatum"/>
+      <property name="sex" type="Sex" description="Das Geschlecht des Mitarbeiters"/>
+      <property name="website" type="String" description="Die Website des Mitarbeiters">
+        <example>www.k-schmidt.de</example>
+      </property>
+      <property name="role" type="Role" description="Beschreibt die Rolle des Mitarbeiters"/>
+      <property name="admin" type="Boolean" description="Gibt an ob der Mitarbeiter ein Admin ist"/>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="Customer" type="Object">
+      <description>Repräsentiert einen Kunden</description>
+      <property name="id" type="Integer" description="Die ID des Kunden">
+        <example>33454</example>
+      </property>
+      <property name="name" type="String" description="Der Name des Kunden">
+        <example>Die Websitenbauer</example>
+      </property>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="Agency" type="Object">
+      <description>Repräsentiert eine Agentur</description>
+      <property name="id" type="Integer" description="Die ID der Agentur">
+        <example>33454</example>
+      </property>
+      <property name="name" type="String" description="Der Name der Agentur">
+        <example>The New Super Agency</example>
+      </property>
+      <property name="rate" type="Float" description="Die globlae Rate der Agentur.">
+        <example>The New Super Agency</example>
+      </property>
+      <property name="created" type="DateTime" description="Das Erstellungsdatum"/>
+      <property name="modified" type="DateTime" description="Das Datum der letzten Änderung"/>
+    </complextype>
+    <complextype name="Chat-Message" type="Object">
+      <description>Repräsentiert eine Chat Nachricht</description>
+      <property name="id" type="Integer" description="Die ID der Message">
+        <example>8877</example>
+      </property>
+      <property name="userId" type="Integer" description="userID">
+        <example>9876</example>
+      </property>
+      <property name="lightboxId" type="Integer" description="lightboxID">
+        <example>12</example>
+      </property>
+      <property name="date" type="DateTime" description="Datum"/>
+      <property name="message" type="String" description="Die Chat Nachricht">
+        <example>Ja, dieses Foto finde ich auch sehr gut.</example>
+      </property>
+      <property name="sendername" type="String" description="Vor- und Nachname des Absenders der Nachricht">
+        <example>SvenHesse</example>
+      </property>
+    </complextype>
+    <complextype name="PurchasedPhoto" type="Object">
+      <description>Repräsentiert ein verkauftes Foto</description>
+      <property name="id" type="Integer" description="Die ID der Message">
+        <example>8877</example>
+      </property>
+      <property name="price" type="Float" description="Der globale Preis des Fotografen für dieses Bild, oder der fotospezifisch festgelegte Preis">
+        <example>3.90</example>
+      </property>
+      <property name="rate" type="Float" description="Die globale Gebühr der Agentur, oder die agenturspezifische Gebühr für das Foto">
+        <example>1.00</example>
+      </property>
+    </complextype>
+  </types>
+  <actions>
+    <group name="Lightbox">
+      <description>Enthält Methoden die für Lightboxen benötigt werden.</description>
+      <action name="create" inServer="true" inClient="true" messageType="LB_CREATE">
+        <description>Ein Nutzer kann eine neue Lightbox anlegen</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="name" type="String" description="Name der Lightbox">
+            <example>
+							Projekt2011</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Lightbox" description="Liefert die Erstellte Lightbox"/>
+        </response>
+      </action>
+      <action name="delete" inServer="true" inClient="true" messageType="LB_DELETE">
+        <description>Ein Besitzer einer Lightbox kann die Lightbox löschen.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>32233</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Löschen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="deletePhoto" inServer="true" inClient="true" messageType="LB_PHOTO_DELETE">
+        <description>Es können Bilder aus der Lightbox entfernt werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>32233</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Photos">
+            <example>33323</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Löschen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="addPhoto" inServer="true" inClient="true" messageType="LB_PHOTO_ADD">
+        <description>Es können Bilder einer Lightbox hinzugefügt werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>32233</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Photos">
+            <example>33323</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Hinzufügen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="addEditor" inServer="true" messageType="LB_MEMBER_INVITEEMPLOYEE">
+        <description>Fügt der Lightbox einen Mitarbeiter hinzu</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="userID" type="Integer" description="Die Session-ID des Mitarbeiters, der hinzugefügt wird">
+            <example>asiajJFDISmdu34858bdjdcb4r5bddcb</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Einladen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="removeEditor" inServer="true" messageType="LB_MEMBER_UNINVITEEMPLOYEE">
+        <description>Entfernt aus der Lightbox einen Mitarbeiter</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="userID" type="Integer" description="Die Session-ID des Mitarbeiters, der entfernt wird">
+            <example>asiajJFDISmdu34858bdjdcb4r5bddcb</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Ausladen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getInvitedEmployees" inServer="true" inClient="true" messageType="LB_MEMBER_GET">
+        <description>Alle eingeladenen Nutzers der Lightbox.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="User-Info" multiple="true" description="Eine Liste mit eingeladenen Nutzern"/>
+        </response>
+      </action>
+      <action name="enter" inServer="true" inClient="true" messageType="LB_ENTER">
+        <description>Sobald ein Nutzer eine Lightbox öffnet, tritt er ihr bei.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Eintreten erfolgreich war."/>
+        </response>
+        <notification>
+          <property name="userID" type="Integer" description="userID des Nutzers, der die Lightbox betreten hat">
+            <example>234544</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </notification>
+      </action>
+      <action name="leave" inServer="true" inClient="true" messageType="LB_LEAVE">
+        <description>Sobald ein Nutzer eine Lightbox schließt, verlässt er sie.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Verlassen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getList" inServer="true" inClient="true" messageType="USER_GETLB">
+        <description>Wenn eine Liste von Lightboxen angefragt wird, werden Information zu allen Lightboxen, auf die der User Zugriff hat, zurückgegeben.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Lightbox" multiple="true" description="Liste mit Lightboxen"/>
+        </response>
+      </action>
+      <action name="getLightBox" inServer="true" inClient="true" messageType="LB_VO_GET">
+        <description>Wenn eine Lightbox angefragt wird, werden alle ihre und in ihr enthaltenen Informationen zurückgeschickt, außer die Bilddaten. Die Bilddaten werden über eine seperate Anfrage gemacht.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Lightbox" description="Die Lightbox"/>
+        </response>
+      </action>
+      <action name="movePhoto" inServer="true" inClient="true" messageType="LB_PHOTO_MOVE">
+        <description>Es können alle Photos in einer Lightbox bewegt werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Photos">
+            <example>33221</example>
+          </property>
+          <property name="x" type="Float" description="Die x Koordinate des Photos">
+            <example>30.432</example>
+          </property>
+          <property name="y" type="Float" description="Die y Koordinate des Photos">
+            <example>50.345</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Bewegen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getImages" inServer="true" inClient="true" messageType="LB_GETIMAGES">
+        <description>Es können alle Photos einer Lightbox angefragt werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="PhotoData" multiple="true" description="Alle Fotos einer Lightbox."/>
+        </response>
+      </action>
+      <action name="edit" inServer="true" inClient="true" messageType="LB_RENAME">
+        <description>Der Title und die Description eienr Leightbox kann geändert werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="name" type="String" description="Neuer Name der Lightbox">
+            <example>Projekt03</example>
+          </property>
+          <property name="description" type="String" description="Neue Beschreibung der Lightbox">
+            <example>Dies sind die Fotos zu unserem Projekt Nr 3.</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Setzen des Namens erfolgreich war."/>
+        </response>
+      </action>
+      <action name="lockPhoto" inServer="true" inClient="true" messageType="LB_PHOTO_LOCK">
+        <description>Sobald ein Nutzer in einer Lightbox ein Foto anfasst oder er es umbennen will, wird es für andere Nutzer gesperrt.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Lightbox Fotos">
+            <example>2322</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Blockieren des Bildes erfolgreich war."/>
+        </response>
+      </action>
+      <action name="unlockPhoto" inServer="true" inClient="true" messageType="LB_PHOTO_UNLOCK">
+        <description>Sobald ein Nutzer in einer Lightbox ein Foto loslässt oder er es nicht mehr umbennen will, wird es für andere Nutzer gesperrt.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Lightbox Fotos">
+            <example>2322</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Freigeben des Bildes erfolgreich war."/>
+        </response>
+      </action>
+      <action name="copy" inServer="false" messageType="LB_COPY">
+        <description>Eine gekaufte Lightbox kann nicht mehr verändert werden, deshalb haben “Agenten” einer Agentur die Möglichkeit sich eine Kopie zu erzeugen.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Integer" description="Die ID der Lightbox">
+            <example>33443</example>
+          </property>
+        </response>
+      </action>
+      <action name="buy" inServer="true" messageType="LB_BUY">
+        <description>Eine Lightbox kann vom Kunden gekauft werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Kaufen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getContactList" inServer="true" messageType="GET_ADRESSBOOK">
+        <description>In einer Lightbox kann das Adressbuch geöffnet werden</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Integer" multiple="true" description="Eine Liste mit userIDs der Kontakte"/>
+        </response>
+      </action>
+      <action name="sendLightBoxMessage" inServer="true" inClient="true" messageType="LB_SENDMESSAGE">
+        <description>Innerhalb einer Lightbox können sich die geraden aktiven Bearbeiter in einem Chat austauschen. Chat-Nachrichten sind einem User und einer Lightbox zugewiesen.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+          <property name="message" type="Chat-Message" description="Die Chat-Nachricht."/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Senden der Nachricht erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getZip" inServer="true" messageType="LB_GETZIP">
+        <description>Es können alle Photos einer gekauften Lightbox zum Download als Zip-Datei angefragt werden. Dabei kann optional ein Ausgabeformat (jpg,png,...) für die Bilder angegeben werden. (Standard ist jpg). Zurückgegeben wird eine Zip-Datei mit allen Photos der Lightbox.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+            <example>34532</example>
+          </property>
+        </request>
+        <response>
+          <property name="zip" type="binary" description="Die Daten der ZIP-Datei"/>
+        </response>
+      </action>
+      <!-- <action name="addPhotoTag" inServer="false" messageType="LB_PHOTO_ADDTAG">
+				<description>Ein Photo kann durch hinzufügen eines ‘Tags’ ergänzt werden, welche bei der Suche nach Photos berücksichtigt werden.</description>
+				<request>
+					<property name="session" type="String"
+						description="Die Session-ID des Benutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+						<example>3332</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Photos">
+						<example>53536</example>
+					</property>
+					<property name="tag" type="Tag"
+						description="Der Tag, der das Bild erhalten soll" />
+				</request>
+				<response>
+					<property name="result" type="SuccessMessage"
+						description="Liefert Aussage, ob Hinzufügen des Tags erfolgreich war." />
+				</response>
+			</action> -->
+      <!--
+			<action name="renamePhoto" inServer="false" messageType="LB_PHOTO_RENAME">
+				<description>Es können Fotos in einer Lightbox individuelle Titel gegeben werden</description>
+				<request>
+					<property name="session" type="String"
+						description="Die Session-ID des Benutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+						<example>1221</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Photos">
+						<example>53536</example>
+					</property>
+					<property name="name" type="String" description="Der Titel des Bildes">
+						<example>Wunderschöne Abendsonne</example>
+					</property>
+				</request>
+				<response>
+					<property name="result" type="SuccessMessage"
+						description="Liefert Aussage, ob das Bennen einer Lightbox erfolgreich war." />
+				</response>
+			</action>
+			<action name="setPhotoRating" inServer="true" messageType="LB_PHOTO_SETSTATE">
+				<description>Ein Photo kann bewertet werden, wodurch das Interesse und die Kaufpriorität des des Kunden verdeutlicht werden kann.</description>
+				<request>
+					<property name="session" type="String"
+						description="Die Session-ID des Benutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="lightboxID" type="Integer" description="Die ID der Lightbox">
+						<example>3332</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Photos">
+						<example>53536</example>
+					</property>
+					<property name="rating" type="Rating"
+						description="Die Bewertung, die das Bild erhalten soll" />
+				</request>
+				<response>
+					<property name="result" type="SuccessMessage"
+						description="Liefert Aussage, ob Setzen des Zustands erfolgreich war." />
+				</response>
+			</action>
+			-->
+    </group>
+    <group name="Photo">
+      <description>Enthält Methoden die für Fotos benötigt werden.</description>
+      <action name="getFullsize" inServer="true" messageType="PHOTO_GETFULLSIZE">
+        <description>Eine Anfrage an das Foto als Original.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Fotos.">
+            <example>636366</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="binary" description="Daten des Fotos"/>
+        </response>
+      </action>
+      <action name="getThumbnail" inServer="true" inClient="true" messageType="PHOTO_GETTHUMBNAIL">
+        <description>Eine Anfrage an ein Thumbnail von einem Foto in einer bestimmten Größe.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Fotos.">
+            <example>636366</example>
+          </property>
+          <property name="height" type="Integer" description="Die Höhe des Fotos.">
+            <example>800</example>
+          </property>
+           <property name="width" type="Integer" description="Die Breite des Fotos.">
+            <example>600</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="binary" description="Daten des Fotos"/>
+        </response>
+      </action>
+      <action name="upload" inServer="true" inClient="true" messageType="PHOTO_UPLOAD">
+        <description>Die Fotografen können Fotos hochladen</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Photographers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photo" type="binary" description="Daten des Fotos"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Hochladen erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getPhotoData" inServer="true" inClient="true" messageType="PHOTO_GETDATA">
+        <description>Eine Anfrage an eine PhotoData.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Fotos.">
+            <example>636366</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="PhotoData" description="Liefert die Photo-Daten."/>
+        </response>
+      </action>
+      <action name="setData" inServer="true" inClient="true" messageType="PHOTO_SETDATA">
+        <description>Die Daten des Fotos können vom Fotografen bearbeitet werden. Die enthaltenen Tags auch von anderen Rollen.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photoData" type="PhotoData" description="Die Daten des Photos"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Bearbeiten erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getAgencyData" inServer="true" inClient="false" messageType="PHOTO_GETAGENCYPHOTODATA">
+        <description>Eine Anfrage an die Agenturspezifischen Daten des Fotos.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Fotos.">
+            <example>636366</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="AgencyPhotoData" description="Liefert die Agenturspezifischen Daten."/>
+        </response>
+      </action>
+      <action name="setAgencyData" inServer="true" messageType="PHOTO_SETAGENCYDATA">
+        <description>Eine Agentur kann Agenturspezifische Daten für ein Foto festlegen</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="AgencyPhotoData" type="AgencyPhotoData" description="Die Agenturspezifischen Daten des Fotos"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Setzen der Agenturspezifischen Daten erfolgreich war."/>
+        </response>
+      </action>
+      <action name="setLightboxData" inServer="true" inClient="true" messageType="PHOTO_SETLIGHTBOXDATA">
+        <description>Setzen der Lightbox spezifischen Daten für ein Foto.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="LightboxPhotoData" type="LightboxPhotoData" description="Die Lightbixspezifiscen Daten des Fotos"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Setzen der Agenturspezifischen Daten erfolgreich war."/>
+        </response>
+      </action>
+      <!--
+			<action name="getLightboxData" inServer="true" messageType="PHOTO_GETLIGHTBOXDATA">
+				<description>Eine Anfrage an die Lightboxspezifischen Daten des Fotos. </description>
+				<request>
+					<property name="session" type="String" description="Die Session-ID des Nutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Fotos.">
+						<example>636366</example>
+					</property>
+				</request>
+				<response>
+					<property name="result" type="LightboxPhotoData"
+						description="Liefert die Lightboxspezifischen Daten des Fotos." />
+				</response>
+			</action>
+			-->
+      <action name="delete" inServer="true" inClient="true" messageType="PHOTO_DELETE">
+        <description>Ein Fotograf kann seine Fotos löschen</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="photoID" type="Integer" description="Die ID des Photos">
+            <example>53536</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Löschen erfolgreich war."/>
+        </response>
+      </action>
+      <!--
+			<action name="editCategory" inServer="false" messageType="PHOTO_EDITCATEGORY">
+				<description>Einem Photo kann eine Kategorie zugeordnet werden</description>
+				<request>
+					<property name="session" type="String"
+						description="Die Session-ID des Benutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Photos">
+						<example>53536</example>
+					</property>
+					<property name="category" type="Category"
+						description="Die Kategorie, die das Photo erhalten soll.">
+						<example>Wunderschöne Abendsonne</example>
+					</property>
+				</request>
+				<response>
+					<property name="result" type="SuccessMessage"
+						description="Liefert Aussage, ob das Hinzufügen einer Kategorie erfolgreich war." />
+				</response>
+			</action>
+
+			 <action name="addTag" inServer="false" messageType="TAG_ADDTAG">
+				<description>Ein Photo kann durch hinzufügen eines ‘Tags’ ergänzt werden, welche bei der Suche nach Photos berücksichtigt werden.</description>
+				<request>
+					<property name="session" type="String"
+						description="Die Session-ID des Benutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Photos">
+						<example>53536</example>
+					</property>
+					<property name="tag" type="Tag"
+						description="Der Tag, der das Bild erhalten soll" />
+				</request>
+				<response>
+					<property name="result" type="SuccessMessage"
+						description="Liefert Aussage, ob Hinzufügen des Tags erfolgreich war." />
+				</response>
+			</action>
+			<action name="deleteTag" inServer="false" messageType="TAG_DELETETAG">
+				<description>Einem Photo kann ein Tag entfernt werden.</description>
+				<request>
+					<property name="session" type="String"
+						description="Die Session-ID des Benutzers">
+						<example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+					</property>
+					<property name="photoID" type="Integer" description="Die ID des Photos">
+						<example>53536</example>
+					</property>
+					<property name="tag" type="Tag"
+						description="Der Tag, der dem Bild entfernt werden soll" />
+				</request>
+				<response>
+					<property name="result" type="SuccessMessage"
+						description="Liefert Aussage, ob das Löschen des Tags erfolgreich war." />
+				</response>
+			</action> -->
+      <action name="search" inServer="true" inClient="true" messageType="GET_SEARCH">
+        <description>Fotos können anhand von Suchbegriffen gesucht werden. Hierbei werden auch die Tags ausgelesen.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="search" type="String" description="Das Suchwort">
+            <example>Abendsonne</example>
+          </property>
+          <property name="category" type="Integer" description="Id der Kategorie in der gesucht werden kann" optional="true">
+            <example>23334</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Integer" multiple="true" description="photoIDs der gefundenen Photos"/>
+        </response>
+      </action>
+    </group>
+    <group name="Category">
+      <description>Methoden rund um die Kategorien.</description>
+      <action name="getList" inServer="true" messageType="GET_CATEGORIES">
+        <description>Es können alle Kategorien abgefragt werden</description>
+        <request/>
+        <response>
+          <property name="result" type="Category" multiple="true" description="Die Liste der definierten Kategorien."/>
+        </response>
+      </action>
+    </group>
+    <group name="User">
+      <description>Enthält Methoden die für User benötigt werden.</description>
+      <action name="login" inServer="true" inClient="true" messageType="USER_LOGIN">
+        <description>Ein User, der sich einloggen möchte, wird vom Server geprüft. Bei erfolgreichem Login wird an den Client die SessionID und der Benutzername zurückgesendet.</description>
+        <request>
+          <property name="username" type="String" description="Der Benutzername des Benutzers">
+            <example>KlausKleber</example>
+          </property>
+          <property name="password" type="String" description="Das Passwort des Benutzers">
+            <example>xxxx</example>
+          </property>
+        </request>
+        <response>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="result" type="User" description="Das Profil des Benutzers"/>
+        </response>
+      </action>
+      <action name="logout" inServer="true" inClient="true" messageType="USER_LOGOUT">
+        <description>Die Session wird beendet.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob der Logout erfolgreich war."/>
+        </response>
+      </action>
+      <action name="get" inServer="true" inClient="true" messageType="USER_GETBYID">
+        <description>Ein Nutzer wird durch seine ID angefragt</description>
+        <request>
+          <property name="id" type="Integer" description="Die ID des Benutzers">
+            <example>45544</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="User" description="Die Daten des Nutzers"/>
+        </response>
+      </action>
+      <action name="update" inServer="true" messageType="USER_UPDATE">
+        <description>Jeder User kann seine Profildaten ändern.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="User" type="User" description="Das Profil des Nutzers"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Ändern erfolgreich war."/>
+        </response>
+      </action>
+      <action name="setAvatar" inServer="true" inClient="true" messageType="AVATAR_SET">
+        <description>Jeder User kann sein Profilbild setzen/ändern.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="avatar" type="binary" description="Das Profilbild des Nutzers"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Ändern erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getAvatar" inServer="true" inClient="true" messageType="AVATAR_GET">
+        <description>Das Profilbild eines nutzers kann angefragt werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="height" type="Integer" description="Die maximal Groesse des Avatars.">
+            <example>150</example>
+          </property>
+          <property name="width" type="Integer" description="Die maximal Breite des Avatars.">
+            <example>100</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="binary" description="Liefert das Profilbild des Users zurück."/>
+        </response>
+      </action>
+    </group>
+    <group name="Photographer">
+      <description>Enthält Methoden die für Photographer benötigt werden.</description>
+      <action name="register" inServer="true" inClient="true" messageType="USER_REGISTERPHOTGRAPHER">
+        <description>Die Fotografen legen sich selber Accounts im System an.</description>
+        <request>
+          <property name="profile" type="Photographer" description="Das Profil des Fotografens"/>
+        </request>
+        <response>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="result" type="String" description="Der Benutzername des Fotografens">
+            <example>KlausKleber</example>
+          </property>
+        </response>
+      </action>
+       <action name="getuploads" inServer="true" inClient="false" messageType="PHOTO_GETUPLOADS">
+        <description>Die Fotografen legen sich selber Accounts im System an.</description>
+		<request>
+          <property name="session" type="String" description="Die Session-ID des Benutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Integer" multiple="true" description="Alle Ids von hochgeladenen Fotos"/>
+        </response>
+      </action>
+    </group>
+    <group name="Agency">
+      <description>Enthält Methoden die für Agency benötigt werden.</description>
+      <action name="update" inServer="true" messageType="AGENCY_UPDATE">
+        <description>Ein Update der Agentur Daten</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="Agency" type="Agency" description="Die Agentur"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Update der Agentur Daten erfolgreich war."/>
+        </response>
+      </action>
+      <action name="get" inServer="true" messageType="AGENCY_GET">
+        <description>Eine Anfrage an die Agentur Daten</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="agencyID" type="Integer" description="Die ID der Agentur.">
+            <example>2342</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Anfragen an Agentur Daten erfolgreich war."/>
+          <property name="Agency" type="Agency" description="Die Agentur"/>
+        </response>
+      </action>
+    </group>
+    <group name="Employee">
+      <description>Enthält Methoden die für alle Mitarbeiter benötigt werden.</description>
+      <action name="create" inServer="false" messageType="USER_CREATEEMPLOYEE">
+        <description>Ein Mitarbeiter kann jeweils entweder vom Agentur-Administrator oder vom Kunden-Administrator erstellt werden.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="user" type="Employee" description="Der neu erstellte Mitarbeiter"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Erstellen eines Mitarbeiters erfolgreich war."/>
+        </response>
+      </action>
+      <action name="update" inServer="false" messageType="USER_UPDATE">
+        <description>Jeder Mitarbeiter kann seine Profildaten ändern.</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Mitarbeiters">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="Employee" type="Employee" description="Das Profil des Mitarbeiters"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Ändern erfolgreich war."/>
+        </response>
+      </action>
+    </group>
+    <group name="Customer">
+      <description>Enthält Methoden die für einen Kunden benötigt werden.</description>
+      <action name="create" inServer="true" messageType="CUSTOMER_CREATECUSTOMER">
+        <description>Eine Agentur-Administrator kann einen Kunden anlegen</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+          <property name="customer" type="Customer" description="Der neu erstellte Kunde"/>
+        </request>
+        <response>
+          <property name="result" type="SuccessMessage" description="Liefert Aussage, ob das Erstellen eines Kunden erfolgreich war."/>
+        </response>
+      </action>
+      <action name="getBoughtPhotos" inServer="true" messageType="PHOTO_BOUGHTPHOTOS">
+        <description>Ein Mitarbeiter eines Kunden kann die gekauften Fotos abrufen</description>
+        <request>
+          <property name="session" type="String" description="Die Session-ID des Nutzers">
+            <example>yvwH8WrBWqz3mabw2TDDTYDUSwDC54HC</example>
+          </property>
+        </request>
+        <response>
+          <property name="result" type="Integer" multiple="true" description="Eine Liste mit IDs der gekauften Photos"/>
+        </response>
+      </action>
+    </group>
+  </actions>
+</leuchttischapi>
+

@@ -1,0 +1,21 @@
+= Ticket-Baum =
+
+== Info ==
+
+Diese Seite listet alle Tickets, die [query:%s diesem Query] entsprechen auf,[[BR]]
+und berücksichtigt dabei ihre gegenseitigen Abhängigkeiten.
+
+Diese Seite wird automatisch durch das Script [source:2011swtpro01/Project/Trac/TicketTree.py TicketTree.py] erstellt. Jede Bearbeitung geht verloren.
+
+Die Abhängigkeiten zwischen Tickets werden in der Ticket-Beschreibung (Description)[[BR]]
+so definiert:
+
+{{{
+@depends Ticket 1[, Ticket 2[, ...]]
+}}}
+
+Beispiel: #69
+
+----
+
+== Tickets ==

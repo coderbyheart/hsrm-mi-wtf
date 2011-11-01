@@ -1,0 +1,60 @@
+= !WorkPackages =
+[[PageOutline()]]
+!WorkPackages unterteilen das Projekt in kleinere Aufgaben-Pakete, ähnlich den [/roadmap Meilensteinen],[[BR]]
+nur dass !WorkPackages thematisch zusammengehörige Tickets gruppieren.
+
+Diese Seite wird [source:/Project/Trac/WorkPackages.py automatisch] aus den [query:type=workpackage Tickets vom Typ workpackage] zusammengestellt,[[BR]]
+und berücksichtigt dabei einige besondere Angaben im jeweiligen Ticket.
+
+== Besondere Ticket-Felder ==
+
+=== Status ===
+
+Der {{{status}}} des Tickets bestimmt die Einordnung in aktive !WorkPackages (accepted, assigned,[[BR]]
+reopened), ausstehende !WorkPackages (new) und erledigte Workpackages (closed).
+
+=== Owner, CC ===
+
+Der Verantwortliche für ein !WorkPackage ist der {{{owner}}} des Tickets, die Mitarbeiter werden aus dem[[BR]]
+Feld {{{CC}}} ausgelesen, wobei die Usernamen dort mit der [wiki:/DevTeam Liste der Entwickler][[BR]]
+abgeglichen wird.
+
+Der Owner eines Workpackages ist für dessen Umsetzung verantwortlich, die Personen im Feld CC[[BR]]
+sind ebenfalls mit der Umsetzung beauftragt.
+
+=== Kommentare ===
+
+Die Kommentare, die in einem !WorkPackage-Ticket hinterlassen werden, sind das Protokoll über[[BR]]
+den Verlauf des !WorkPackages.
+
+=== @-tags in der Beschreibung ===
+
+@-tags werden in der Beschreibung des Tickets eingetragen.
+
+ {{{@start}}} und {{{@end}}}::
+  Diese beiden Tags beschreiben den Beginn und das Ende eines !WorkPackages. Sie müssen[[BR]]
+  im Format {{{YYYY-MM-DD}}} sein und werden verwendet um die WorkPackages nach Beginn[[BR]]
+  zu sortieren.
+ {{{@status}}}::
+  Die Ampel des !WorkPackages wird durch den Tag {{{@status}}} bestimmt, der standardmäßig auf[[BR]]
+  {{{grün}}} steht. Mögliche weitere Werte sind {{{rot}}} und {{{gelb}}}. Die einzelnen Stati[[BR]]
+  bedeuten dabei:[[BR]]
+  **grün**: Alles in Ordnung, Zeitplan wird eingehalten, keine Probleme, Fragen, offene Abhängigkeiten, etc[[BR]]
+  **gelb**: es gibt kleinere Probleme[[BR]]
+  **rot**: Akutes dringendes Problem, das (sofort) gelöst werden muss
+ {{{@task}}}::
+  Mit {{{@task}}} beschreibt man, welche Person welche Aufgabe für dieses !WorkPackage hatte.[[BR]]
+  Die Beschreibung sollte dabei stichpunktartig sein. Das Format ist[[BR]]
+  {{{@task [person] [Beschreibung der Aufgabe]}}}[[BR]]
+  wobei {{{[person]}}} das Kürzel aus der [DevTeam Liste der Entwickler] ist und {{{[Beschreibung der Aufgabe]}}}[[BR]]
+  der beschreibende Text.
+
+== Zuordnung von Tickets zu !WorkPackages ==
+
+Tickets ordnet man einem Workpackage zu, in dem man in den Keywords des Tickets das Keyword[[BR]]
+des Workpackages einträgt, z.B. {{{workpackage-115}}}.
+
+= Übersicht =
+[[Image(source:/Project/Wochenberichte/gantt.png, 900)]]
+
+
